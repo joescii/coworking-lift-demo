@@ -1110,16 +1110,16 @@
 	  }
 
 	  function addListeners() {
-	    listening = true;
-
-	    // Handle form submission for Webflow forms
-	    $doc.on('submit', namespace + ' form', function(evt) {
-	      var data = $.data(this, namespace);
-	      if (data.handler) {
-	        data.evt = evt;
-	        data.handler(data);
-	      }
-	    });
+//	    listening = true;
+//
+//	    // Handle form submission for Webflow forms
+//	    $doc.on('submit', namespace + ' form', function(evt) {
+//	      var data = $.data(this, namespace);
+//	      if (data.handler) {
+//	        data.evt = evt;
+//	        data.handler(data);
+//	      }
+//	    });
 	  }
 
 	  // Reset data common to all submit handlers
