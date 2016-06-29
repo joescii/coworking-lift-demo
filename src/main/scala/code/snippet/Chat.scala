@@ -36,7 +36,10 @@ object Chat {
     (if (User.get.isDefined) ".login [class+]" #> "hide"
     else ".chat [class+]" #> "hide") &
       ClearClearable &
-      ".message *" #> ms.get().map(_.text)
+      ".message *" #> ms.get().map { msg =>
+        ".sender-name *" #> msg.user &
+        ".message-content *" #> msg.text 
+      }
   }
 
 }
