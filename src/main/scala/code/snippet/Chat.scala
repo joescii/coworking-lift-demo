@@ -59,7 +59,8 @@ object Chat {
         ".sender-name *" #> msg.user &
         ".message-content *" #> msg.text
       } &
-      "#Compose" #> (SHtml.text(msg, msg = _, "id" -> "Compose") ++ SHtml.hidden(onAjax))
+      "#Compose" #> (SHtml.text(msg, msg = _, "id" -> "Compose") ++ SHtml.hidden(onAjax)) andThen
+      "#wf-form-Compose" #> SHtml.makeFormsAjax 
   }
 
 }
