@@ -1,6 +1,7 @@
 package code.snippet
 
 import java.util.concurrent.atomic.AtomicReference
+import java.util.function.UnaryOperator
 
 import net.liftweb.http.{S, SessionVar}
 import net.liftweb.util.ClearClearable
@@ -13,6 +14,11 @@ case class Message(user:String, text:String)
 object Chat {
   private [this] val ms = new AtomicReference(List(Message("proftom", "I'm awesome"), Message("Elsa", "Beware of the frozen heart")))
 
+  private [this] def append(msg:Message):Unit =
+    ms.updateAndGet(new UnaryOperator[List[Message]] {
+      override def apply(m: List[Message]) = (m :+ msg).takeRight(5)
+    })
+
   private [this] def doLogin:Unit = for {
     r <- S.request if r.post_?
     name <- S.param("name")
@@ -24,8 +30,9 @@ object Chat {
   private [this] def doChat:Unit = for {
     r <- S.request if r.post_?
     message <- S.param("Compose")
+    user <- User.get
   } yield {
-    println(message)
+    append(Message(user, message))
     S.redirectTo("/")
   }
 
@@ -38,7 +45,7 @@ object Chat {
       ClearClearable &
       ".message *" #> ms.get().map { msg =>
         ".sender-name *" #> msg.user &
-        ".message-content *" #> msg.text 
+        ".message-content *" #> msg.text
       }
   }
 
