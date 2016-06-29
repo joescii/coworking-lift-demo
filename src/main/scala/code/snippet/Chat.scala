@@ -14,8 +14,17 @@ object Chat {
     S.redirectTo("/")
   }
 
+  private [this] def doChat:Unit = for {
+    r <- S.request if r.post_?
+    message <- S.param("Compose")
+  } yield {
+    println(message)
+    S.redirectTo("/")
+  }
+
   def render = {
     doLogin
+    doChat
 
     if (User.get.isDefined) ".login [class+]" #> "hide"
     else ".chat [class+]" #> "hide"
