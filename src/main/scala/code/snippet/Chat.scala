@@ -3,9 +3,10 @@ package code.snippet
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.UnaryOperator
 
+import net.liftweb.actor.LiftActor
 import net.liftweb.http.js.JsCmd
 import net.liftweb.http.js.JsCmds.SetValById
-import net.liftweb.http.{S, SHtml, SessionVar}
+import net.liftweb.http.{ListenerManager, S, SHtml, SessionVar, UpdateDOM}
 import net.liftweb.util.ClearClearable
 import net.liftweb.util.Helpers._
 
@@ -39,6 +40,7 @@ object Chat {
   }
 
   def render = {
+    S.session.foreach(_.plumbUpdateDOM(listenTo = List(ChatActor)))
     doLogin
     doChat
 
@@ -46,6 +48,7 @@ object Chat {
 
     def onAjax():JsCmd = {
       User.get.foreach(u => append(Message(u, msg)))
+      ChatActor ! ""
       SetValById("Compose", "")
     }
 
@@ -59,4 +62,12 @@ object Chat {
       "#Compose" #> (SHtml.text(msg, msg = _, "id" -> "Compose") ++ SHtml.hidden(onAjax))
   }
 
+}
+
+object ChatActor extends LiftActor with ListenerManager {
+  override def createUpdate = ""
+
+  override def lowPriority = {
+    case _ => sendListenersMessage(UpdateDOM())
+  }
 }
