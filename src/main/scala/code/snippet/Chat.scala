@@ -3,7 +3,9 @@ package code.snippet
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.UnaryOperator
 
-import net.liftweb.http.{S, SessionVar}
+import net.liftweb.http.js.JsCmd
+import net.liftweb.http.js.JsCmds.SetValById
+import net.liftweb.http.{S, SHtml, SessionVar}
 import net.liftweb.util.ClearClearable
 import net.liftweb.util.Helpers._
 
@@ -40,13 +42,21 @@ object Chat {
     doLogin
     doChat
 
+    var msg = ""
+
+    def onAjax():JsCmd = {
+      User.get.foreach(u => append(Message(u, msg)))
+      SetValById("Compose", "")
+    }
+
     (if (User.get.isDefined) ".login [class+]" #> "hide"
     else ".chat [class+]" #> "hide") &
       ClearClearable &
       ".message *" #> ms.get().map { msg =>
         ".sender-name *" #> msg.user &
         ".message-content *" #> msg.text
-      }
+      } &
+      "#Compose" #> (SHtml.text(msg, msg = _, "id" -> "Compose") ++ SHtml.hidden(onAjax))
   }
 
 }
